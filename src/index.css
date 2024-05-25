@@ -1,0 +1,20 @@
+body {
+  margin: 0;
+  font-family: "Mikhak" !important;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.ant-btn {
+  font-family: 'Mikhak';
+}
+
+@font-face {
+  font-family: 'Mikhak';
+  src: local('Mikhak'), url(./fonts/Mikhak[DSTY\,KSHD\,wght].woff2) format('woff2');
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

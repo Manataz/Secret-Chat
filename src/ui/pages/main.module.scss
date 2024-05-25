@@ -1,0 +1,35 @@
+.main {
+    background: linear-gradient(90deg, #FFC7CA 0%, #E299FF 100%);
+    text-align: center;
+    width: 100vw;
+    height: 100vh;
+
+    .header {
+        width: 100%;
+        padding-top: 32px;
+        display: flex;
+    }
+
+    :global {
+        .ant-form-item .ant-form-item-explain-error {
+            text-align: right !important;
+            margin: 10px 5px !important;
+            font-family: 'Mikhak' !important;
+            color: #AB1F6C !important;
+        }
+
+        .ant-select-single {
+            height: 56px !important;
+            width: 40%;
+        }
+
+        .ant-select-selection-item {
+            text-align: center !important;
+        }
+
+        .ant-modal-title {
+            text-align: center !important;
+        }
+
+    }
+}

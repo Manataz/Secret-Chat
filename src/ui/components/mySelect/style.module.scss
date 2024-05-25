@@ -1,0 +1,44 @@
+.selectStyle {
+    
+    :global {
+        .ant-select-item {
+            font-family: "Mikhak" !important;
+            text-align: right !important;
+        }
+        .ant-select {
+            font-family: "Mikhak" !important;
+        }
+        .ant-select-single {
+            height: 56px !important;
+        }
+        .ant-select-selector {
+            border-radius: 15px;
+            font-family: 'Mikhak';
+            font-size: 16px;
+            font-weight: 700;
+
+            >span {
+                background: -webkit-linear-gradient(270deg, #931372 0%, #EA3E5C 100%);
+                background-clip: text;
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+            }
+
+            >input {
+                color: black !important;
+            }
+        }
+
+        .ant-select-single {
+            height: 56px !important;
+        }
+
+        .ant-select-selection-search-input {
+            color: black !important;
+        }
+    }
+}
+.customOption {
+    font-family: "Mikhak" !important;
+    text-align: right;
+}

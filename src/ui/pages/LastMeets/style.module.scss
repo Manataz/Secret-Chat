@@ -1,0 +1,80 @@
+@use "../main.module.scss";
+
+.parentContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    justify-content: space-between;
+    align-items: center;
+
+    .mainContainer {
+        width: 90%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: end;
+        margin: 0 18px;
+        gap: 10px;
+
+        .tabHolder {
+            display: flex;
+            width: 100%;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .tabBody {
+            display: flex;
+            width: 100%;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+
+            .myBorder {
+                background:linear-gradient(270deg, #931372 0%, #EA3E5C 100%);
+                height: 1px;
+            }
+
+            .userItem {
+                display: flex;
+                flex-direction: row;
+                justify-content: center;
+                width: 100%;
+                align-items: center;
+
+                .reportButton {
+                    height: 30px;
+                    border-radius: 10px;
+                    font-size: 10px;
+                    font-weight: 900;
+                }
+
+                .nameHolder {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: right;
+                    align-items: end;
+
+                    .idHolder {
+                        display: flex;
+                        gap: 4px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+.submitBtn {
+    width: 40%;
+}
+
+.modalButton {
+    width: 100%;
+}

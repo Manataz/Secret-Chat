@@ -1,0 +1,39 @@
+@use "../main.module.scss";
+
+.parentContainer {
+    font-family: "Mikhak";
+    display: flex;
+    flex-direction: column;
+    height: 75%;
+    justify-content: space-between;
+    align-items: center;
+
+    :global {
+        .ant-otp-input {
+            padding-inline: 6px;
+            height: 58px;
+            font-size: 22px;
+            font-weight: 900;
+            font-family: 'Mikhak';
+            background: var(--Color, #AB1F6C);
+            color: white;
+            border-radius: 15px;
+        }
+    }
+
+    .timer {
+        font-weight: 700;
+        font-size: 34px;
+    }
+    .buttonsContainer {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 20px;
+        width: 90%;    
+        .editEmailBtn {
+            width: 40%;
+        }    
+    }
+}

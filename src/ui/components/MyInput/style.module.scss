@@ -1,0 +1,14 @@
+.inputContainer {
+    :global {
+        .ant-input {
+            padding: 16px 11px !important;
+            text-align: center;
+            font-family: 'Mikhak';
+        }
+        .ant-input-outlined {
+            border: 1px solid #C2C2C2 !important;
+            border-radius: 15px !important;
+        }
+        
+    }
+}

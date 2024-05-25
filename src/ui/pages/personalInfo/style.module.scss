@@ -1,0 +1,46 @@
+@use "../main.module.scss";
+
+.parentContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(90deg, #FFC7CA 0%, #E299FF 100%);
+    :global {
+        .ant-select-single {
+            height: 56px !important;
+        }
+        .ant-upload {
+            width: 100% !important;
+        }
+        
+    }
+    .mainContainer {
+        width: 80%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: end;
+    
+        .formStyles {
+            width: 100%;
+            margin-left: 18px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 10px;
+    
+            .nameDescription {
+                position: relative;
+                top: -20px;
+                font-family: 'Mikhak';
+                text-align: right;
+                margin: 10px 5px !important;
+                height: 0;
+            }
+        }
+    }
+}
+.submitBtn {
+    width: 100%;
+}

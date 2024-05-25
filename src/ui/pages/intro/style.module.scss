@@ -1,0 +1,35 @@
+.fullWidth {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    .fullWidthBtn {
+        width: 90%;
+        height: 56px;
+        border: 1px solid;
+        border-radius: 18px;
+        border-image-source: linear-gradient(270deg, #931372 0%, #EA3E5C 100%);
+        font-weight: 900;
+        font-size: 16px;
+
+
+        >span {
+            background: -webkit-linear-gradient(270deg, #931372 0%, #EA3E5C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+    }
+
+    .haveAccount {
+        font-size: 14px;
+        font-weight: 500;
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
+        .haveAccountTxt {
+            color: black;
+        }
+    }
+}

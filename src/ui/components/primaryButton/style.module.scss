@@ -1,0 +1,23 @@
+.myButton {
+    background: linear-gradient(270deg, #931372 0%, #EA3E5C 100%) !important;
+    color: white;
+    height: 56px;
+    font-size: 14px;
+    font-weight: 900;
+    font-family: "Mikhak";
+    border-radius: 15px;
+}
+.myWhiteButton {
+    background: white;
+    font-size: 14px;
+    font-weight: 900;
+    height: 56px;
+    font-family: "Mikhak";
+    border-radius: 15px;
+    >span {
+        background: -webkit-linear-gradient(270deg, #931372 0%, #EA3E5C 100%);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+}
