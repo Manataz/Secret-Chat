@@ -6,7 +6,7 @@ import MyInput from "../../components/MyInput/MyInput";
 import { useEffect, useState } from "react";
 import MySelect from "../../components/mySelect/MySelect";
 import { useAppDispatch, useAppSelector } from "../../../repository/hooks";
-import { personalInfoSelector, getAvatars, getProviences, reset, completeProfile, editProfile, getPersonalInfo } from "../../../features/personalInfo.ts/personalInfoSlice";
+import { personalInfoSelector, getAvatars, getProviences, reset, completeProfile, editProfile, getPersonalInfo, acceptTerms } from "../../../features/personalInfo.ts/personalInfoSlice";
 import { UserOutlined } from "@ant-design/icons";
 import camera from "../../../icons/camera.svg";
 import BackButton from "../../components/backButton/BackButton";
@@ -86,7 +86,8 @@ const PersonalInfo = () => {
         if (state?.from && state?.from === "HOME") {
             dispatch(editProfile({ ...values, AvatarId: myAvatar.id }))
         } else {
-            dispatch(completeProfile({ ...values, Gender: gender, AvatarId: myAvatar.id }))
+            dispatch(completeProfile({ ...values, Gender: gender, AvatarId: myAvatar.id }));
+            dispatch(acceptTerms());
         }
     }
     return (

@@ -196,6 +196,32 @@ export const getReportMessages = createAsyncThunk(
         return res;
     }
 )
+export const acceptTerms = createAsyncThunk(
+    "userProfile/acceptTerms",
+    () => {
+        const token = localStorage.getItem("TOKEN");
+        const res = axios
+            .request({
+                url: `${BASE_URL}api/userProfile/acceptTerms`,
+                method: "POST",
+                headers: { "Authorization": `Bearer ${token}` },
+            })
+            .then(({ data }) => {
+                return { ...data, type: "acceptT" };
+            })
+            .catch(error => {
+                return error;
+
+                // if (error.response && error.response.status === 403) {
+                //     console.warn(error.response)
+                // }
+            })
+            .finally(() => { });
+
+        // const res = axios.post().then(data => data);
+        return res;
+    }
+)
 export const completeProfile = createAsyncThunk(
     "userProfile/completeProfile",
     (values: any) => {
@@ -329,6 +355,18 @@ export const personalInfoSlice = createSlice({
             state.data = action.payload;
         });
         builder.addCase(getProviences.rejected, (state, action) => {
+            state.loading = false;
+            state.data = undefined;
+            state.error = action.error;
+        });
+        builder.addCase(acceptTerms.pending, (state) => {
+            state.loading = true;
+        });
+        builder.addCase(acceptTerms.fulfilled, (state, action: PayloadAction<any>) => {
+            state.loading = false;
+            state.data = action.payload;
+        });
+        builder.addCase(acceptTerms.rejected, (state, action) => {
             state.loading = false;
             state.data = undefined;
             state.error = action.error;
