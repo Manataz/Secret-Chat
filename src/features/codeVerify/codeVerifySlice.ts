@@ -6,7 +6,7 @@ const BASE_URL = "https://blinddate.darksea.ir/"
 export interface AuthState {
     loading: boolean;
     data: any;
-    error: SerializedError | string | undefined;
+    error: any;
 }
 const initialState: AuthState = {
     loading: false,
@@ -49,7 +49,13 @@ export const codeSlice = createSlice({
         });
         builder.addCase(sendCode.fulfilled, (state, action: PayloadAction<any>) => {
             state.loading = false;
-            state.data = action.payload;
+            if (axios.isAxiosError(action.payload)) {
+                state.data = undefined;
+                state.error = action.payload?.response?.data as { statusCode: number, message: string };
+            } else {
+                state.data = action.payload;
+                state.error = undefined;
+            }
         });
         builder.addCase(sendCode.rejected, (state, action) => {
             state.loading = false;

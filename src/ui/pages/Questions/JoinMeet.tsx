@@ -26,7 +26,7 @@ const JoinMeet: React.FC = () => {
 
     // const sheetRef = useRef<BottomSheetRef | null>(null)
     const [form] = Form.useForm();
-    const { newMessage, events, isConnected } = Connector();
+    const { newMessage, events, isConnected, tryAnotherConnect } = Connector();
     const { state } = useLocation();
     const [modelRecieved, setModelRecieved] = useState<any>();
     const [openReasonModal, setOpenReasonModal] = useState<boolean>(false);
@@ -66,7 +66,6 @@ const JoinMeet: React.FC = () => {
     }, [events]);
 
     useEffect(() => {
-        console.warn("hwatas", meetName, modelRecieved)
         if (meetName && modelRecieved) {
             pageNavigation(modelRecieved);
         }
@@ -85,7 +84,6 @@ const JoinMeet: React.FC = () => {
     }, [selectedUsers]);
 
     const pageNavigation = (messageRecieved: any) => {
-        console.error(meetName)
         if (messageRecieved?.PartnerResponse && messageRecieved?.PartnerResponse?.Answer !== null) {
             setPartnerResponse(messageRecieved?.PartnerResponse);
         }
@@ -161,9 +159,12 @@ const JoinMeet: React.FC = () => {
     useEffect(() => {
         if (!initialized.current) {
             initialized.current = true;
-            console.warn("isConnected", isConnected)
+            
             if (isConnected) {
                 newMessage("joinMeet", [`${myProvince}`, `${gender}`])
+            } else {
+                console.warn("isConnected", isConnected)
+                tryAnotherConnect();
             }
         }
     }, [isConnected]);
@@ -270,7 +271,10 @@ const JoinMeet: React.FC = () => {
                     </Form>
                 </div>
                 <PrimaryButton
-                    onClick={() => { form.submit() }}
+                    onClick={() => { 
+                        form.submit();
+                        navigate("/home")
+                     }}
                     label="ثبت"
                     myClassName={classes.modalButton} />
             </Modal>

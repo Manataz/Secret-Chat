@@ -23,16 +23,20 @@ const CodeVerfication: React.FC = () => {
     const dispatch = useAppDispatch();
     useEffect(() => {
         // setUsers(selectedUsers);
+        console.warn("sss", selectedUsers)
         if (selectedUsers.data !== undefined && selectedUsers.data.accessToken) {
             localStorage.setItem("TOKEN", selectedUsers.data.accessToken)
             localStorage.setItem("REFRESH_TOKEN", selectedUsers.data.refreshToken)
             dispatch(reset())
             navigate("/personalInfo");
-        } else if(selectedUsers.error) {
-            messageApi.open({
-                type: 'error',
-                content: "مقادیر وارد شده اشتباه است",
-            });
+        } else if (selectedUsers.error && !selectedUsers.loading) {
+            if(selectedUsers.error?.message) {
+                messageApi.open({
+                    type: 'error',
+                    content: selectedUsers.error?.message,
+                });
+                dispatch(reset());
+            }
         }
         return () => {
             console.log("component unmounting...");
@@ -54,7 +58,7 @@ const CodeVerfication: React.FC = () => {
     });
 
     useEffect(() => {
-        if (timeLeft > 0) {
+        if (timeLeft >= 0) {
             if (timeLeft > 9)
                 setTimeLeftStr(digitsEnToFa("00:" + timeLeft))
             else
@@ -78,7 +82,12 @@ const CodeVerfication: React.FC = () => {
                     <Input.OTP length={6} onChange={sendVerifyCode} />
                 </div>
                 <div className={classes.buttonsContainer}>
-                    <SecondaryButton isLoading={selectedUsers.loading} label="ارسال مجدد کد تایید" onClick={() => { dispatch(loginUser(email)) }} myClassName={classes.editEmailBtn} />
+                    <SecondaryButton isLoading={selectedUsers.loading} label="ارسال مجدد کد تایید" onClick={() => {
+                        if (timeLeft <= 0) {
+                            dispatch(loginUser(email));
+                            setTimeLeft(59);
+                        }
+                    }} myClassName={classes.editEmailBtn} />
                     <PrimaryButton isLoading={selectedUsers.loading} label="اصلاح ایمیل" onClick={() => { navigate("./login", { state: { myReset: true } }) }} myClassName={classes.editEmailBtn} />
                 </div>
 

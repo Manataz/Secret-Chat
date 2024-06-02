@@ -6,12 +6,14 @@
     height: 75%;
     justify-content: space-between;
     align-items: center;
+
     :global {
         .ant-select-single {
             height: 56px !important;
             width: 40%;
         }
     }
+
     .mainContainer {
         width: 90%;
         display: flex;
@@ -28,13 +30,30 @@
         }
     }
 }
+
 .submitBtn {
     width: 40%;
 }
+
 .meetButton {
     width: 90%;
 }
+
 .bottomTab {
     position: fixed;
     bottom: 0;
+}
+
+.modalButton {
+    width: 40%;
+    margin: 0 10px;
+}
+
+.myModal {
+    :global {
+        .ant-modal-title {
+            text-align: center !important;
+            font-family: "Mikhak";
+        }
+    }
 }

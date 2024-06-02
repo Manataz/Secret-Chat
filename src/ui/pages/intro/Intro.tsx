@@ -19,10 +19,10 @@ const Intro = () => {
         <Flex vertical justify="space-between" align="center" gap={90}>
           <img src={require("./../../../introImage.png")}></img>
           <div className={classes.fullWidth}>
-            <Link to="/signup"><Button className={classes.fullWidthBtn} size="large">ثبت نام</Button></Link>
+            <Link to="/signup" replace><Button className={classes.fullWidthBtn} size="large">ثبت نام</Button></Link>
 
             <div className={classes.haveAccount}>
-              <Link to="/login" style={{ color: "white " }}>ورود</Link>
+              <Link to="/login" replace style={{ color: "white " }}>ورود</Link>
               <div className={classes.haveAccountTxt}>
                 اکانت دارید؟
               </div>

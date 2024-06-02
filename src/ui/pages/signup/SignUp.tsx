@@ -21,6 +21,12 @@ const SignUp: React.FC = () => {
         if(selectedUsers.data !== undefined && selectedUsers.data.statusCode === 200) {
             dispatch(reset())
             navigate("/codeVerfication", { state: { email: form.getFieldValue("emailAddress") }, replace: true});
+        } else {
+            if(selectedUsers.error?.status === 400) {
+                form.setFields([{name: "emailAddress", errors:["ورودی ها اشتباه هستند"]}])
+            } else {
+                form.setFields([{name: "emailAddress", errors:[typeof(selectedUsers.error) === typeof("") ? selectedUsers.error : selectedUsers.error?.message]}])
+            }
         }
         return () => {
           console.log("component unmounting...");
@@ -65,13 +71,14 @@ const SignUp: React.FC = () => {
                                 required: true,
                                 message: "ایمیل خود را وارد کنید"
                             },
+                            {
+                                pattern: new RegExp(`[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$`),
+                                message: "ایمیل وارد شده معتبر نیست"
+                            }
                         ]}>
                             <MyInput placeholder="ایمیل خود را وارد نمایید" />
                         </Form.Item>
                     </Form>
-                    {selectedUsers.data === undefined && (
-                        <MessageBox type="error" content="خطایی رخ داد!" />
-                    )}
                 </div>
                 <PrimaryButton isLoading={selectedUsers.loading} myClassName={classes.submitBtn} label="ارسال کد تایید" onClick={() => {
                     form.submit()

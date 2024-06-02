@@ -37,8 +37,13 @@ const PersonalInfo = () => {
         if (selectedUsers.data !== undefined && selectedUsers.data.type === "edit" && selectedUsers.data.statusCode === 200) {
             navigate("./home")
         }
-        if (selectedUsers.data !== undefined && selectedUsers.data.type === "profile" && selectedUsers.data.result !== undefined) {
-            navigate("./home")
+        if (selectedUsers.data !== undefined
+            && selectedUsers.data.type === "profile"
+            && selectedUsers.data.result !== undefined
+            && selectedUsers.data.result.completedProfile) {
+            if (!state?.from || state?.from !== "HOME") {
+                navigate("./home")
+            }
         }
         return () => {
             console.log("component unmounting...");

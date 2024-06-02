@@ -6,22 +6,25 @@ const BASE_URL = "https://blinddate.darksea.ir/"
 export interface AuthState {
     loading: boolean;
     data: any;
-    error: any;
+    error: any | undefined;
 }
 const initialState: AuthState = {
     loading: false,
     data: undefined,
     error: undefined,
 }
-export const registerUser = createAsyncThunk(
-    "auth/register",
-    (values: any) => {
-
+export const logoutUser = createAsyncThunk(
+    "auth/logoutUser",
+    () => {
+        const token = localStorage.getItem("TOKEN");
         const res = axios
             .request({
-                url: `${BASE_URL}api/authorize/register`,
-                method: "POST",
-                data: values
+                url: `${BASE_URL}api/authorize/logout`,
+                method: "GET",
+                headers: {
+                    "Content-Type": "text/json",
+                    "Authorization": `Bearer ${token}`,
+                },
             })
             .then(({ data }) => {
                 return data;
@@ -38,23 +41,21 @@ export const registerUser = createAsyncThunk(
         // const res = axios.post().then(data => data);
         return res;
     }
-)
-export const userSlice = createSlice({
-    name: "users",
+);
+
+export const logoutSlice = createSlice({
+    name: "login",
     initialState,
     extraReducers: (builder) => {
-        builder.addCase(registerUser.pending, (state) => {
+        builder.addCase(logoutUser.pending, (state) => {
             state.loading = true;
         });
-        builder.addCase(registerUser.fulfilled, (state, action: PayloadAction<any>) => {
+        builder.addCase(logoutUser.fulfilled, (state, action: PayloadAction<any>) => {
             state.loading = false;
-            if (axios.isAxiosError(action.payload)) {
-                state.error = action.payload?.response?.data as { status: number, message?: string, title?: string };
-            } else {
-                state.data = action.payload;
-            }
+            state.data = action.payload;
+            state.error = undefined;
         });
-        builder.addCase(registerUser.rejected, (state, action) => {
+        builder.addCase(logoutUser.rejected, (state, action) => {
             state.loading = false;
             state.data = undefined;
             state.error = action.error;
@@ -66,7 +67,8 @@ export const userSlice = createSlice({
         },
     },
 });
+
 export const { reset } =
-    userSlice.actions;
-export const userSelector = (state: RootState) => state.userReducer;
-export default userSlice.reducer;
+    logoutSlice.actions;
+export const logoutSelector = (state: RootState) => state.logoutReducer;
+export default logoutSlice.reducer;

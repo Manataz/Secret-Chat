@@ -15,7 +15,7 @@ class Connector {
             })
             .withAutomaticReconnect()
             .build();
-        this.connection.start().then(() => {this.isConnected = true}).catch(err => console.error(err));
+        this.connection.start().then(() => {this.isConnected = true}).catch(err => console.error(err)).finally(() => {{this.isConnected = true}});
         this.events = (onMessageReceived) => {
             this.connection?.on("ReceiveMessage", (username, message) => {
                 onMessageReceived(username, message);
@@ -32,6 +32,24 @@ class Connector {
         if (!Connector.instance)
             Connector.instance = new Connector();
         return Connector.instance;
+    }
+
+    public tryAnotherConnect = () => {
+        this.isConnected = false;
+        this.connection = new signalR.HubConnectionBuilder()
+            .withUrl(URL, {
+                accessTokenFactory: () => { return this.loginToken ?? "" },
+                transport: signalR.HttpTransportType.LongPolling,
+            })
+            .withAutomaticReconnect([0, 500, 1000, 2000, 5000])
+            .build();
+        this.connection.start().then(() => {this.isConnected = true}).catch(err => console.error(err)).finally(() => {{this.isConnected = true}});
+        this.events = (onMessageReceived) => {
+            this.connection?.on("ReceiveMessage", (username, message) => {
+                onMessageReceived(username, message);
+            });
+        };
+
     }
 }
 export default Connector.getInstance;

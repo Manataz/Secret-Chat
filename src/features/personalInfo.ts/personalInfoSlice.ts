@@ -270,7 +270,7 @@ export const editProfile = createAsyncThunk(
         const token = localStorage.getItem("TOKEN");
         const res = axios
             .post(
-                `${BASE_URL}api/userProfile/editProfile`,
+                `${BASE_URL}api/userProfile/editUserProfile`,
                 data,
                 {
                     headers: {
