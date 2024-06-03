@@ -6,8 +6,10 @@ class Connector {
     static instance: Connector;
     private loginToken = localStorage.getItem("TOKEN");
     public isConnected = false;
+    private onConnectCallback: (() => void) | undefined;
 
-    constructor() {
+    constructor(onConnect?: () => void) {
+        this.onConnectCallback = onConnect;
         this.connection = new signalR.HubConnectionBuilder()
             .withUrl(URL, {
                 accessTokenFactory: () => { return this.loginToken ?? "" },
@@ -15,7 +17,12 @@ class Connector {
             })
             .withAutomaticReconnect()
             .build();
-        this.connection.start().then(() => {this.isConnected = true}).catch(err => console.error(err)).finally(() => {{this.isConnected = true}});
+        this.connection.start().then(() => {
+            this.isConnected = true;
+            if(this.onConnectCallback) {
+                this.onConnectCallback();
+            }
+        }).catch(err => console.error(err)).finally(() => {{this.isConnected = true}});
         this.events = (onMessageReceived) => {
             this.connection?.on("ReceiveMessage", (username, message) => {
                 onMessageReceived(username, message);
@@ -28,28 +35,10 @@ class Connector {
         console.warn("args", methodName, args)
         this.connection?.send(methodName, ...args).then(x => console.log("sent"))
     }
-    public static getInstance(): Connector {
+    public static getInstance(onConnect: () => void): Connector {
         if (!Connector.instance)
-            Connector.instance = new Connector();
+            Connector.instance = new Connector(onConnect);
         return Connector.instance;
-    }
-
-    public tryAnotherConnect = () => {
-        this.isConnected = false;
-        this.connection = new signalR.HubConnectionBuilder()
-            .withUrl(URL, {
-                accessTokenFactory: () => { return this.loginToken ?? "" },
-                transport: signalR.HttpTransportType.LongPolling,
-            })
-            .withAutomaticReconnect([0, 500, 1000, 2000, 5000])
-            .build();
-        this.connection.start().then(() => {this.isConnected = true}).catch(err => console.error(err)).finally(() => {{this.isConnected = true}});
-        this.events = (onMessageReceived) => {
-            this.connection?.on("ReceiveMessage", (username, message) => {
-                onMessageReceived(username, message);
-            });
-        };
-
     }
 }
 export default Connector.getInstance;

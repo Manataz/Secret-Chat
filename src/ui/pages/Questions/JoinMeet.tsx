@@ -33,7 +33,6 @@ const JoinMeet: React.FC = () => {
 
     // const sheetRef = useRef<BottomSheetRef | null>(null)
     const [form] = Form.useForm();
-    const { newMessage, events, isConnected, tryAnotherConnect } = Connector();
     const { state } = useLocation();
     const [modelRecieved, setModelRecieved] = useState<any>();
     const [openReasonModal, setOpenReasonModal] = useState<boolean>(false);
@@ -58,7 +57,8 @@ const JoinMeet: React.FC = () => {
     const navigate = useNavigate();
     const { myProvince } = state;
     const { gender } = state;
-
+    const { newMessage, events, isConnected } = Connector(() => {newMessage("joinMeet", [`${myProvince}`, `${gender}`])});
+    
     const handleFinish = (values: any) => {
         if (values.reason !== undefined && values.reason !== "") {
             setOpenReasonModal(false);
@@ -198,13 +198,6 @@ const JoinMeet: React.FC = () => {
     useEffect(() => {
         if (!initialized.current) {
             initialized.current = true;
-            console.log(isConnected)
-            if (isConnected) {
-                newMessage("joinMeet", [`${myProvince}`, `${gender}`])
-            } else {
-                console.warn("isConnected", isConnected)
-                tryAnotherConnect();
-            }
         }
     }, [isConnected]);
 
