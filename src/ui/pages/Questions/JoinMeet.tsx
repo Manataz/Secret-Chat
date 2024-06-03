@@ -105,7 +105,11 @@ const JoinMeet: React.FC = () => {
         if (currentScreen === "ANSWERCUSTOMQ") {
             setMultipleResponses(r => {
                 if (messageRecieved?.PartnerResponse) {
-                    return [...r, messageRecieved?.PartnerResponse]
+                    if (r.findIndex(f => f.MeetQuestionId === messageRecieved?.PartnerResponse?.MeetQuestionId) >= 0) {
+                        return [...r]
+                    } else {
+                        return [...r, messageRecieved?.PartnerResponse]
+                    }
                 } else {
                     return [...r]
                 }
@@ -131,6 +135,7 @@ const JoinMeet: React.FC = () => {
                 setCurrentScreen("ANSWERCUSTOMQ")
             }
             if (messageRecieved.Message === "UserQuestion" && meetName) {
+                newMessage("StartUserQuestion", [meetName])
                 setCurrentScreen("ASKQ")
             }
             if (messageRecieved.Message === "wait" && meetName) {
@@ -160,7 +165,8 @@ const JoinMeet: React.FC = () => {
                     setIsYesNo(true);
                     setCurrentScreen("GENERALQ")
                 } else if (messageRecieved.Message === "Paint" && meetName) {
-                    setCurrentScreen("DRAW")
+                    newMessage("StartPaintAvatar", [meetName]);
+                    setCurrentScreen("DRAW");
                 } else if (messageRecieved?.Questions !== undefined && messageRecieved?.Questions?.length === 3) {
                     setMultipleQuestions(messageRecieved?.Questions?.map((qp: any) => {
                         return { id: qp.UserQId, title: qp.Title, expireDate: qp.ExpireTime }
