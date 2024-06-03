@@ -21,6 +21,13 @@ import MyInput from "../../components/MyInput/MyInput";
 
 declare type ScreenStates = "JOINMEET" | "GENERALQ" | "ASKQ" | "ANSWERCUSTOMQ" | "YESNOQ" | "PESONALQ" | "DRAW" | "SEEART" | "RATE" | "COMPLETED";
 
+export interface EmojiResponse {
+    ResponseId: number;
+    Emojie: string;
+    MeetQuestionId: number | null;
+    UserQuestionId: number | null;
+}
+
 const JoinMeet: React.FC = () => {
     const initialized = useRef(false);
 
@@ -30,11 +37,15 @@ const JoinMeet: React.FC = () => {
     const { state } = useLocation();
     const [modelRecieved, setModelRecieved] = useState<any>();
     const [openReasonModal, setOpenReasonModal] = useState<boolean>(false);
+    const [endMeetReason, setEndMeetReason] = useState<string>();
+    const [openEndMeetModal, setOpenEndMeetModal] = useState<boolean>(false);
+    const [emojis, setEmojis] = useState<EmojiResponse[]>();
     const [isYesNo, setIsYesNo] = useState<boolean>(false);
     const [personalQ, setPersonalQ] = useState<boolean>(false);
     const [meetName, setMeetName] = useState<string>();
     const [instagramId, setInstagramId] = useState<string>();
     const [reaction, setReaction] = useState<boolean>();
+    const [pageLoading, setPageLoading] = useState<boolean>(false);
     const [singleQuestion, setSingleQuestion] = useState<Question>();
     const [multipleQuestions, setMultipleQuestions] = useState<Question[]>();
     const [partnerResponse, setPartnerResponse] = useState<UserResponse>();
@@ -49,8 +60,11 @@ const JoinMeet: React.FC = () => {
     const { gender } = state;
 
     const handleFinish = (values: any) => {
-        setOpenReasonModal(false);
-        newMessage("endMeet", [meetName, values.reason]);
+        if (values.reason !== undefined && values.reason !== "") {
+            setOpenReasonModal(false);
+            newMessage("endMeet", [meetName, values.reason]);
+            navigate("/home");
+        }
     }
 
     useEffect(() => {
@@ -84,6 +98,7 @@ const JoinMeet: React.FC = () => {
     }, [selectedUsers]);
 
     const pageNavigation = (messageRecieved: any) => {
+        setPageLoading(false);
         if (messageRecieved?.PartnerResponse && messageRecieved?.PartnerResponse?.Answer !== null) {
             setPartnerResponse(messageRecieved?.PartnerResponse);
         }
@@ -118,10 +133,28 @@ const JoinMeet: React.FC = () => {
             if (messageRecieved.Message === "UserQuestion" && meetName) {
                 setCurrentScreen("ASKQ")
             }
+            if (messageRecieved.Message === "wait" && meetName) {
+                setPageLoading(true);
+            }
         } else {
             if (messageRecieved) {
                 if (messageRecieved?.MeetInfo?.Partner?.Name) {
                     // navigate("/questions");
+                } else if (messageRecieved.Message === "emojie" && meetName) {
+                    setEmojis(r => {
+                        if (r) {
+                            return [...r, messageRecieved.Response];
+                        } else {
+                            return [messageRecieved.Response];
+                        }
+                    });
+                } else if (messageRecieved.Message === "EndMeet" && meetName) {
+                    setEndMeetReason(messageRecieved.Reason)
+                    setOpenEndMeetModal(true);
+                } else if (messageRecieved.Message === "NextGeneralQ" && meetName) {
+                    newMessage("NextGeneralQuestion", [`${meetName}`])
+                    setIsYesNo(false);
+                    setCurrentScreen("GENERALQ");
                 } else if (messageRecieved.Message === "Next2OptionQ" && meetName) {
                     newMessage("Next2OptionQuestion", [`${meetName}`])
                     setIsYesNo(true);
@@ -159,7 +192,7 @@ const JoinMeet: React.FC = () => {
     useEffect(() => {
         if (!initialized.current) {
             initialized.current = true;
-            
+            console.log(isConnected)
             if (isConnected) {
                 newMessage("joinMeet", [`${myProvince}`, `${gender}`])
             } else {
@@ -170,7 +203,7 @@ const JoinMeet: React.FC = () => {
     }, [isConnected]);
 
     return (
-        <div className={classes.main}>
+        <div className={`${classes.main} ${pageLoading ? classes.loadingPage : ""}`}>
             {currentScreen !== "JOINMEET" && currentScreen !== "COMPLETED" && (
                 <div className={classes.header}>
                     <BackButton imgSrc={giveup} callFunction={() => {
@@ -190,9 +223,11 @@ const JoinMeet: React.FC = () => {
                     question={singleQuestion?.title ?? ""}
                     questionId={`${singleQuestion?.id}`}
                     meetName={meetName ?? ""}
-                    key={`${meetName}-${isYesNo}`}
+                    key={`${meetName}-${isYesNo}-${singleQuestion?.id}-${emojis?.length}`}
                     expirationDate={singleQuestion?.expireDate ?? ""}
                     answer={partnerResponse?.Answer ?? ""}
+                    answerId={partnerResponse?.ResponseId}
+                    emojis={emojis}
                     type={isYesNo}
                     calls={(methodName: string, args: any[]) => {
                         newMessage(methodName, args);
@@ -207,6 +242,7 @@ const JoinMeet: React.FC = () => {
                 <AnswerCustom
                     question={multipleQuestions ?? []}
                     answer={multipleResponses ? multipleResponses : []}
+                    emojis={emojis}
                     calls={(methodName: string, args: any[]) => {
                         if (methodName === "goToDraw") {
                             setCurrentScreen("DRAW")
@@ -216,6 +252,7 @@ const JoinMeet: React.FC = () => {
                         }
                     }}
                     isPersonal={personalQ}
+
                     meetName={meetName ?? ""} />
             )}
             {currentScreen === "DRAW" && (
@@ -266,16 +303,36 @@ const JoinMeet: React.FC = () => {
                                 message: 'ذکر دلیل اجباریست',
                             },
                         ]}>
-                            <MyInput placeholder="پاسخ خود را وارد کنید. (حداکثر 20 کاراکتر)"/>
+                            <MyInput placeholder="پاسخ خود را وارد کنید. (حداکثر 20 کاراکتر)" />
                         </Form.Item>
                     </Form>
                 </div>
                 <PrimaryButton
-                    onClick={() => { 
+                    onClick={() => {
                         form.submit();
                         navigate("/home")
-                     }}
+                    }}
                     label="ثبت"
+                    myClassName={classes.modalButton} />
+            </Modal>
+            <Modal
+                title={"قرار لغو شد"}
+                centered
+                open={openEndMeetModal}
+                closable={false}
+                onCancel={() => setOpenEndMeetModal(false)}
+                footer={<></>}>
+                <div className={classes.modalParent}>
+                    <h4>دلیل:</h4>
+                    <ul>
+                        <li>{endMeetReason}</li>
+                    </ul>
+                </div>
+                <PrimaryButton
+                    onClick={() => {
+                        form.submit();
+                    }}
+                    label="باشه"
                     myClassName={classes.modalButton} />
             </Modal>
         </div>

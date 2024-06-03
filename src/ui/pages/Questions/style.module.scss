@@ -12,6 +12,14 @@
         .ant-avatar {
             border-color: #FD397F !important;
         }
+        .ant-modal-title {
+            text-align: center !important;
+            font-family: "Mikhak" !important;
+        }
+        .ant-modal {
+            text-align: center !important;
+            font-family: "Mikhak" !important;
+        }
     }
     
     .mainContainer {
@@ -32,4 +40,16 @@
 }
 .modalButton {
     width: 98%;
+}
+
+.loadingPage {
+    filter: blur(4px);
+}
+.modalParent {
+    width: 100%;
+    text-align: right;
+    direction: rtl;
+    display: flex;
+    flex-direction: column;
+    justify-content: right;
 }

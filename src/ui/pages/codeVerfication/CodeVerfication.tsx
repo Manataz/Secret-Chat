@@ -23,7 +23,6 @@ const CodeVerfication: React.FC = () => {
     const dispatch = useAppDispatch();
     useEffect(() => {
         // setUsers(selectedUsers);
-        console.warn("sss", selectedUsers)
         if (selectedUsers.data !== undefined && selectedUsers.data.accessToken) {
             localStorage.setItem("TOKEN", selectedUsers.data.accessToken)
             localStorage.setItem("REFRESH_TOKEN", selectedUsers.data.refreshToken)

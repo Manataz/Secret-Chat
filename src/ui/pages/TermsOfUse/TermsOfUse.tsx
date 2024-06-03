@@ -1,11 +1,17 @@
 import BottomTab from "../../components/BottomTab/BottomTab";
+import classes from "./style.module.scss";
 
 const TermsOfUse = () => {
     return (
-        <div>
+        <div className={classes.main}>
+            <div className={classes.parentContainer}>
+                <div className={classes.mainContainer}>
 
-            <h2>قوانین و مقررات</h2>
-            <BottomTab active={2} />
+                    <h2>قوانین و مقررات</h2>
+                </div>
+
+                <BottomTab active={2} className={classes.bottomTab} />
+            </div>
         </div>
     )
 }

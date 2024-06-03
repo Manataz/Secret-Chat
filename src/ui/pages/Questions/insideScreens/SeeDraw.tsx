@@ -8,6 +8,7 @@ interface IProps {
     meetName: string;
     calls: (methodName: string, args: any[]) => void;
     avatarUrl: string | undefined;
+    meetAvatarId?: number;
     nextPage: () => void;
 }
 
@@ -25,7 +26,9 @@ const SeeDraw: React.FC<IProps> = (props) => {
                     style={{ width: "100%" }} />
                 <h4>تصور کاربر مقابل از شما</h4>
                 <img style={{ width: "300px", height: "300px", background: "#ffffff" }} src={props.avatarUrl} />
-                <EmojiPicker />
+                <EmojiPicker emojiChosen={(emojiCode: string) => {
+                    props.calls("addAvatarEmoji", [props.meetName, `${props.meetAvatarId}`, emojiCode])
+                }}/>
             </div>
             <PrimaryButton
                 label={"ادامه"}

@@ -6,12 +6,14 @@ import { useEffect, useState } from "react";
 import { digitsEnToFa } from "@persian-tools/persian-tools";
 import EmojiPicker from "../../../components/EmojiPicker/EmojiPicker";
 import { Question, UserResponse } from "../models/models";
+import { EmojiResponse } from "../JoinMeet";
 
 interface IProps {
     question: Question[];
     meetName: string;
     isPersonal: boolean;
     answer?: UserResponse[];
+    emojis?: EmojiResponse[];
     calls: (methodName: string, args: any[]) => void
 }
 
@@ -19,6 +21,7 @@ const AnswerCustom: React.FC<IProps> = (props) => {
     const [form] = Form.useForm();
     const [nextButtonLabel, setNextButtonLabel] = useState<string>("...در انتظار");
     const [timeLeftStr, setTimeLeftStr] = useState("");
+    const [myEmojis, setMyEmojis] = useState<EmojiResponse[]>([]);
     const [minutes, setMinutes] = useState(3)
     const [seconds, setSeconds] = useState(0)
     const [timeLeft, setTimeLeft] = useState(180);
@@ -48,7 +51,7 @@ const AnswerCustom: React.FC<IProps> = (props) => {
 
     useEffect(() => {
         setTimeLeftStr(digitsEnToFa(`${minutes}:${seconds}`))
-        if(timeLeft === 0) {
+        if (timeLeft === 0) {
             props.calls("Next2OptionQuestion", [`${props.meetName}`])
         }
     }, [timeLeft]);
@@ -85,7 +88,7 @@ const AnswerCustom: React.FC<IProps> = (props) => {
                                             onClick={() => {
                                                 const answer = form.getFieldValue("answer" + index);
                                                 if (answer !== "") {
-                                                    if(props.isPersonal) {
+                                                    if (props.isPersonal) {
                                                         props.calls("SavePersonalQAnswer", [props.meetName, `${q.id}`, answer]);
                                                     } else {
                                                         props.calls("SaveUserQAnswer", [props.meetName, `${q.id}`, answer]);
@@ -97,7 +100,7 @@ const AnswerCustom: React.FC<IProps> = (props) => {
                                             myClassName={classes.answerButton} />
                                     </div>
                                     <div style={{ flex: "1", textAlign: "right" }}>
-                                        {String.fromCodePoint(0x1f603)}
+                                        {props.emojis?.find(e => e.UserQuestionId === q.id)?.Emojie}
                                     </div>
                                 </div>
                             </div>
@@ -108,24 +111,35 @@ const AnswerCustom: React.FC<IProps> = (props) => {
                 {props.answer?.map((ans: UserResponse, index: number) => {
                     return (
                         <>
-                        {ans.Answer && ans.Answer !== "" && (
+                            {ans.Answer && ans.Answer !== "" && (
                                 <div key={`a${index}`}>
                                     <div className={classes.partnerAnswerHolder}>
                                         {ans.Answer}
                                     </div>
                                     <div className={classes.emojiContainer}>
-                                        {String.fromCodePoint(0x1f603)}
+                                        {myEmojis.find(e => e.ResponseId === ans.ResponseId)?.Emojie}
                                     </div>
-                                    <EmojiPicker />
+                                    <EmojiPicker emojiChosen={(emojiCode: string) => {
+                                        setMyEmojis(r => {
+                                            return [...r,
+                                            {
+                                                Emojie: emojiCode,
+                                                ResponseId: ans.ResponseId,
+                                                MeetQuestionId: null,
+                                                UserQuestionId: null
+                                            }]
+                                        });
+                                        props.calls("addEmojie", [props.meetName, `${ans.ResponseId}`, emojiCode])
+                                    }} />
                                 </div>
-                        ) }
+                            )}
                         </>
                     )
                 })}
             </div>
             <PrimaryButton label={nextButtonLabel} onClick={() => {
                 if (props.answer && props.answer.length >= 3) {
-                    if(props.isPersonal) {
+                    if (props.isPersonal) {
                         form.resetFields();
                         props.calls("goToDraw", []);
                     } else {

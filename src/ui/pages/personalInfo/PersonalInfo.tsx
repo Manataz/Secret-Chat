@@ -45,6 +45,16 @@ const PersonalInfo = () => {
                 navigate("./home")
             }
         }
+        if (selectedUsers.data !== undefined
+            && selectedUsers.data.type === "profile"
+            && selectedUsers.data.result !== undefined) {
+            form.setFieldValue("ProvinceId",
+                {
+                    value: selectedUsers.data.result.province?.provinceId,
+                    name: selectedUsers.data.result.province?.provinceName
+                });
+            form.setFieldValue("InstagramId", selectedUsers.data.result.instagramId)
+        }
         return () => {
             console.log("component unmounting...");
         };

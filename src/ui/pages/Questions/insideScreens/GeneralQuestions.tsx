@@ -8,6 +8,7 @@ import EmojiPicker from "../../../components/EmojiPicker/EmojiPicker";
 import { useEffect, useState } from "react";
 import { digitsEnToFa } from "@persian-tools/persian-tools";
 import moment from "moment";
+import { EmojiResponse } from "../JoinMeet";
 
 interface IProps {
     question: string;
@@ -16,12 +17,16 @@ interface IProps {
     expirationDate: string;
     type: boolean;
     answer?: string;
+    answerId?: number;
+    emojis?: EmojiResponse[];
     calls: (methodName: string, args: any[]) => void
 }
 
 const GeneralQuestions: React.FC<IProps> = (props) => {
     const [form] = Form.useForm();
     const [nextButtonLabel, setNextButtonLabel] = useState<string>("...در انتظار");
+    const [myEmojiCode, setMyEmojiCode] = useState<string>();
+    const [responseEmojiCode, setResponseEmojiCode] = useState<string>();
     const [timeLeftStr, setTimeLeftStr] = useState("");
     const [yesNoAnswer, setYesNoAnswer] = useState<boolean>();
     const [minutes, setMinutes] = useState(moment(props.expirationDate).diff(moment(), 'minutes'))
@@ -34,7 +39,13 @@ const GeneralQuestions: React.FC<IProps> = (props) => {
         } else {
             setNextButtonLabel("...در انتظار");
         }
-    }, [props.answer])
+    }, [props.answer]);
+
+    useEffect(() => {
+        if (props.emojis) {
+            setResponseEmojiCode(props.emojis.find(e => `${e.MeetQuestionId}` === props.questionId)?.Emojie);
+        }
+    }, [props.emojis])
 
 
     useEffect(() => {
@@ -105,7 +116,7 @@ const GeneralQuestions: React.FC<IProps> = (props) => {
                         )}
                     </Form.Item>
                     <div className={classes.emojiContainer} style={{ position: "relative", top: "-20px" }}>
-                        {String.fromCodePoint(0x1f603)}
+                        {responseEmojiCode}
                     </div>
                     <div className={classes.progressContainer}>
                         <PrimaryButton
@@ -141,9 +152,12 @@ const GeneralQuestions: React.FC<IProps> = (props) => {
                     {props.answer}
                 </div>
                 <div className={classes.emojiContainer}>
-                    {String.fromCodePoint(0x1f603)}
+                    {myEmojiCode}
                 </div>
-                <EmojiPicker />
+                <EmojiPicker emojiChosen={(emojiCode: string) => {
+                    setMyEmojiCode(emojiCode)
+                    props.calls("addEmojie", [props.meetName, `${props.answerId}`, emojiCode])
+                }} />
             </div>
             <PrimaryButton label={nextButtonLabel} onClick={() => {
                 if (props.answer) {

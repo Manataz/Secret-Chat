@@ -46,7 +46,6 @@ const Home: React.FC = () => {
     }, [selectedUsers]);
 
     useEffect(() => {
-        console.warn(myLogoutSelector)
         if (myLogoutSelector && myLogoutSelector.data === "" && openReasonModal) {
             localStorage.removeItem("TOKEN");
             navigate("/Intro");

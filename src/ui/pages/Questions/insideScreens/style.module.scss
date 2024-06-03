@@ -85,6 +85,14 @@
                 .ant-btn-default {
                     background: linear-gradient(270deg, #931372 0%, #EA3E5C 100%) !important;
                 }
+                .ant-modal-title {
+                    text-align: center !important;
+                    font-family: "Mikhak" !important;
+                }
+                .ant-modal {
+                    text-align: center !important;
+                    font-family: "Mikhak" !important;
+                }
             }
         }
 
@@ -94,7 +102,7 @@
             justify-content: center;
             align-items: center;
             position: relative;
-            top: -30px;
+            top: -20px;
 
             &.standalone {
                 width: 100%;

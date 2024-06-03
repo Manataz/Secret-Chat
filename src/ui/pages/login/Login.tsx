@@ -15,7 +15,6 @@ const Login: React.FC = () => {
     const selectedUsers = useAppSelector(loginSelector);
     const dispatch = useAppDispatch();
     useEffect(() => {
-        console.warn("ssss",selectedUsers);
         if(selectedUsers.data !== undefined && selectedUsers.data.statusCode === 200) {
             dispatch(reset())
             if(buttonClicked) {
