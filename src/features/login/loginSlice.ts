@@ -52,8 +52,10 @@ export const loginSlice = createSlice({
             state.loading = false;
             if (axios.isAxiosError(action.payload)) {
                 state.error = action.payload?.response?.data as { statusCode: number, message: string };
+                state.data = undefined;
             } else {
                 state.data = action.payload;
+                state.error = undefined;
             }
         });
         builder.addCase(loginUser.rejected, (state, action) => {

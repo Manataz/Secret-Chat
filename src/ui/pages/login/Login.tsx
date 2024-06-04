@@ -15,6 +15,7 @@ const Login: React.FC = () => {
     const selectedUsers = useAppSelector(loginSelector);
     const dispatch = useAppDispatch();
     useEffect(() => {
+        console.warn("selectedUsers", selectedUsers)
         if(selectedUsers.data !== undefined && selectedUsers.data.statusCode === 200) {
             dispatch(reset())
             if(buttonClicked) {
@@ -27,6 +28,7 @@ const Login: React.FC = () => {
             dispatch(reset());
         } else {
             form.setFields([{name: "emailAddress", errors:[typeof(selectedUsers.error) === typeof("") ? selectedUsers.error : selectedUsers.error?.message]}])
+            dispatch(reset());
         }
         return () => {
           console.log("component unmounting...");

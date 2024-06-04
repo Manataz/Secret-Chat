@@ -80,7 +80,8 @@ const SignUp: React.FC = () => {
                         </Form.Item>
                     </Form>
                 </div>
-                <PrimaryButton isLoading={selectedUsers.loading} myClassName={classes.submitBtn} label="ارسال کد تایید" onClick={() => {
+                <PrimaryButton isLoading={selectedUsers.loading} myClassName={classes.submitBtn} label="ارسال کد تایید"
+                 onClick={() => {
                     form.submit()
                 }} />
             </div>

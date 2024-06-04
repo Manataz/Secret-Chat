@@ -50,8 +50,10 @@ export const userSlice = createSlice({
             state.loading = false;
             if (axios.isAxiosError(action.payload)) {
                 state.error = action.payload?.response?.data as { status: number, message?: string, title?: string };
+                state.data = undefined;
             } else {
                 state.data = action.payload;
+                state.error = undefined;
             }
         });
         builder.addCase(registerUser.rejected, (state, action) => {

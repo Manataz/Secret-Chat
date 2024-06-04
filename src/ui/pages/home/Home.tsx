@@ -4,7 +4,7 @@ import { PrimaryButton, SecondaryButton } from "../../components/primaryButton/P
 import classes from "./style.module.scss";
 import MySelect from "../../components/mySelect/MySelect";
 import { useAppDispatch, useAppSelector } from "../../../repository/hooks";
-import { getProviences, personalInfoSelector, getPersonalInfo } from "../../../features/personalInfo.ts/personalInfoSlice";
+import { getProviences, personalInfoSelector, getPersonalInfo, acceptTerms } from "../../../features/personalInfo.ts/personalInfoSlice";
 import { useEffect, useRef, useState } from "react";
 import editBadge from "../../../icons/editBadge.svg"
 import { HomeOutlined, InfoOutlined, UserOutlined } from "@ant-design/icons";
@@ -53,6 +53,7 @@ const Home: React.FC = () => {
     }, [myLogoutSelector]);
 
     useEffect(() => {
+        // dispatch(acceptTerms())
         const t = localStorage.getItem("TOKEN");
         if (t === null) {
             navigate("/login")

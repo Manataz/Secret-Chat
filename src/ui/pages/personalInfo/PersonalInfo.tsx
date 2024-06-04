@@ -53,7 +53,8 @@ const PersonalInfo = () => {
                     value: selectedUsers.data.result.province?.provinceId,
                     name: selectedUsers.data.result.province?.provinceName
                 });
-            form.setFieldValue("InstagramId", selectedUsers.data.result.instagramId)
+            form.setFieldValue("InstagramId", selectedUsers.data.result.instagramId);
+            setGender(selectedUsers.data.result.gender)
         }
         return () => {
             console.log("component unmounting...");
@@ -99,6 +100,7 @@ const PersonalInfo = () => {
 
     const handleSave = (values: any) => {
         if (state?.from && state?.from === "HOME") {
+            dispatch(acceptTerms());
             dispatch(editProfile({ ...values, AvatarId: myAvatar.id }))
         } else {
             dispatch(completeProfile({ ...values, Gender: gender, AvatarId: myAvatar.id }));
@@ -185,7 +187,11 @@ const PersonalInfo = () => {
                         >
                             <Upload
                                 beforeUpload={(file) => {
-                                    return false;
+                                    if (file.size > 500 * 1024) {
+                                        form.setFields([{name: "Profile", errors:["سایز عکس باید کمتر از 500 کیلوبایت باشد"]}])
+                                        return false;
+                                    }
+                                    return true;
                                 }}
                                 onChange={handleChangeImage}
                                 multiple={false}
