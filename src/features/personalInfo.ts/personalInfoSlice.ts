@@ -222,6 +222,19 @@ export const acceptTerms = createAsyncThunk(
         return res;
     }
 )
+
+function DataURIToBlob(dataURI: string) {
+    const splitDataURI = dataURI.split(',')
+    const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+    const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+
+    const ia = new Uint8Array(byteString.length)
+    for (let i = 0; i < byteString.length; i++)
+        ia[i] = byteString.charCodeAt(i)
+
+    return new Blob([ia], { type: mimeString })
+}
+
 export const completeProfile = createAsyncThunk(
     "userProfile/completeProfile",
     (values: any) => {
@@ -263,7 +276,7 @@ export const editProfile = createAsyncThunk(
     "userProfile/editProfile",
     (values: any) => {
         let data = new FormData();
-        data.append('Profile', values.Profile.file, values.Profile.file.name);
+        data.append('Profile', values.Profile.file?.originFileObj, values.Profile.file?.originFileObj?.name);
         data.append('ProvinceId', values.ProvinceId);
         data.append('InstagramId', values.InstagramId);
         data.append('AvatarId', values.AvatarId);
@@ -295,17 +308,7 @@ export const editProfile = createAsyncThunk(
         return res;
     }
 )
-function DataURIToBlob(dataURI: string) {
-    const splitDataURI = dataURI.split(',')
-    const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
-    const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
 
-    const ia = new Uint8Array(byteString.length)
-    for (let i = 0; i < byteString.length; i++)
-        ia[i] = byteString.charCodeAt(i)
-
-    return new Blob([ia], { type: mimeString })
-}
 export const paintPartnerAvatar = createAsyncThunk(
     "userProfile/paintPartnerAvatar",
     (values: any) => {

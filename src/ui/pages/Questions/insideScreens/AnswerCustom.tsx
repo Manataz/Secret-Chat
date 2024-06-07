@@ -12,6 +12,7 @@ interface IProps {
     question: Question[];
     meetName: string;
     isPersonal: boolean;
+    nextStep?: () => void;
     answer?: UserResponse[];
     emojis?: EmojiResponse[];
     calls: (methodName: string, args: any[]) => void
@@ -138,15 +139,15 @@ const AnswerCustom: React.FC<IProps> = (props) => {
                 })}
             </div>
             <PrimaryButton label={nextButtonLabel} onClick={() => {
-                if (props.answer && props.answer.length >= 3) {
-                    if (props.isPersonal) {
-                        form.resetFields();
-                        props.calls("goToDraw", []);
-                    } else {
-                        form.resetFields();
-                        props.calls("Next2OptionQuestion", [`${props.meetName}`]);
-                    }
+                if (props.nextStep) props.nextStep()
+                if (props.isPersonal) {
+                    form.resetFields();
+                    props.calls("goToDraw", []);
+                } else {
+                    // form.resetFields();
+                    props.calls("Next2OptionQuestion", [`${props.meetName}`]);
                 }
+
             }} myClassName={classes.nextQButton} />
         </div>
     )

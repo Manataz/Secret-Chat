@@ -38,6 +38,8 @@ const JoinMeet: React.FC = () => {
     const [openReasonModal, setOpenReasonModal] = useState<boolean>(false);
     const [endMeetReason, setEndMeetReason] = useState<string>();
     const [openEndMeetModal, setOpenEndMeetModal] = useState<boolean>(false);
+    const [nextStep, setNextStep] = useState<() => void>();
+    const [nextStepStr, setNextStepStr] = useState<string>("");
     const [emojis, setEmojis] = useState<EmojiResponse[]>();
     const [isYesNo, setIsYesNo] = useState<boolean>(false);
     const [personalQ, setPersonalQ] = useState<boolean>(false);
@@ -57,8 +59,8 @@ const JoinMeet: React.FC = () => {
     const navigate = useNavigate();
     const { myProvince } = state;
     const { gender } = state;
-    const { newMessage, events, isConnected } = Connector(() => {newMessage("joinMeet", [`${myProvince}`, `${gender}`])});
-    
+    const { newMessage, events, isConnected } = Connector(() => { newMessage("joinMeet", [`${myProvince}`, `${gender}`]) });
+
     const handleFinish = (values: any) => {
         if (values.reason !== undefined && values.reason !== "") {
             setOpenReasonModal(false);
@@ -87,6 +89,22 @@ const JoinMeet: React.FC = () => {
     }, [meetName, modelRecieved]);
 
     useEffect(() => {
+        if (currentScreen === "GENERALQ") {
+            setNextStep(() => {
+                if (isYesNo) {
+                    newMessage("Next2OptionQuestion", [`${meetName}`])
+                    setIsYesNo(true);
+                    setCurrentScreen("GENERALQ");
+                } else {
+                    newMessage("NextGeneralQuestion", [`${meetName}`])
+                    setIsYesNo(false);
+                    setCurrentScreen("GENERALQ");
+                }
+            })
+        }
+    }, [currentScreen]);
+
+    useEffect(() => {
         if (selectedUsers.data !== undefined && selectedUsers.data.type === "edit") {
             newMessage("GetPaintedAvatars", [meetName])
             setPaintedAvatarUrl(selectedUsers.data.result);
@@ -105,7 +123,7 @@ const JoinMeet: React.FC = () => {
         if (currentScreen === "ANSWERCUSTOMQ") {
             setMultipleResponses(r => {
                 if (messageRecieved?.PartnerResponse) {
-                    if (r.findIndex(f => f.MeetQuestionId === messageRecieved?.PartnerResponse?.MeetQuestionId) >= 0) {
+                    if (r.findIndex(f => f.ResponseId === messageRecieved?.PartnerResponse?.ResponseId) >= 0) {
                         return [...r]
                     } else {
                         return [...r, messageRecieved?.PartnerResponse]
@@ -123,20 +141,29 @@ const JoinMeet: React.FC = () => {
             })
             setPartnerResponse(undefined);
             setCurrentScreen("GENERALQ");
-        } else if (messageRecieved && messageRecieved.StatusCode === 400) {
+        }
+        if (messageRecieved && messageRecieved.StatusCode === 400) {
             if (messageRecieved.Message === "NextGeneralQ" && meetName) {
-                newMessage("NextGeneralQuestion", [`${meetName}`])
-                setIsYesNo(false);
-                setCurrentScreen("GENERALQ")
+                setNextStepStr("General");
+                setNextStep(() => {
+                    console.error("scond");
+
+                    newMessage("NextGeneralQuestion", [`${meetName}`])
+                    setIsYesNo(false);
+                    setCurrentScreen("GENERALQ")
+                })
             }
             if (messageRecieved.Message === "PersonalQ" && meetName) {
-                newMessage("NextPersonalQuestion", [`${meetName}`])
-                setMultipleResponses([]);
-                setCurrentScreen("ANSWERCUSTOMQ")
+                setNextStepStr("Personal");
+                setNextStep(() => {
+                    newMessage("NextPersonalQuestion", [`${meetName}`])
+                    setMultipleResponses([]);
+                    setCurrentScreen("ANSWERCUSTOMQ")
+                })
             }
             if (messageRecieved.Message === "UserQuestion" && meetName) {
+                setNextStepStr("User");
                 newMessage("StartUserQuestion", [meetName])
-                setCurrentScreen("ASKQ")
             }
             if (messageRecieved.Message === "wait" && meetName) {
                 setPageLoading(true);
@@ -157,17 +184,11 @@ const JoinMeet: React.FC = () => {
                     setEndMeetReason(messageRecieved.Reason)
                     setOpenEndMeetModal(true);
                 } else if (messageRecieved.Message === "NextGeneralQ" && meetName) {
-                    newMessage("NextGeneralQuestion", [`${meetName}`])
-                    setIsYesNo(false);
+                    setNextStepStr("General");
                     setCurrentScreen("GENERALQ");
                 } else if (messageRecieved.Message === "Next2OptionQ" && meetName) {
-                    newMessage("Next2OptionQuestion", [`${meetName}`])
-                    setIsYesNo(true);
-                    setCurrentScreen("GENERALQ")
-                } else if (messageRecieved.Message === "Paint" && meetName) {
-                    newMessage("StartPaintAvatar", [meetName]);
-                    setCurrentScreen("DRAW");
-                } else if (messageRecieved?.Questions !== undefined && messageRecieved?.Questions?.length === 3) {
+                    setNextStepStr("Option");
+                }  else if (messageRecieved?.Questions !== undefined && messageRecieved?.Questions?.length === 3) {
                     setMultipleQuestions(messageRecieved?.Questions?.map((qp: any) => {
                         return { id: qp.UserQId, title: qp.Title, expireDate: qp.ExpireTime }
                     }))
@@ -181,6 +202,35 @@ const JoinMeet: React.FC = () => {
                     setPersonalQ(true)
                     setMultipleResponses([]);
                     setCurrentScreen("ANSWERCUSTOMQ")
+                }       else if (messageRecieved.Message === "success" && meetName) {
+                    setNextStepStr(s => {
+                        if (s === "Option") {
+                            setIsYesNo(true);
+                            setCurrentScreen("GENERALQ");
+                            return "OptionSuccess";
+                        } else if (s === "General") {
+                            setIsYesNo(false);
+                            setCurrentScreen("GENERALQ");
+                            return "GeneralSuccess";
+                        } else {
+                            setIsYesNo(false);
+                            return s;
+                        }
+                    });
+                } else if (messageRecieved.Message === "UserQuestion" && meetName) {
+                    setNextStepStr(s => {
+                        if (s === "User") {
+                            setCurrentScreen("ASKQ");
+                            return "UserSuccess"
+                        } else {
+                            newMessage("StartUserQuestion", [meetName])
+                            return "User";
+                        }
+                    });
+                } else if (messageRecieved.Message === "Paint" && meetName) {
+                    setNextStepStr("Paint");
+                    newMessage("StartPaintAvatar", [meetName]);
+                    setCurrentScreen("DRAW");
                 } else if (messageRecieved?.Result !== undefined && messageRecieved?.Result?.partner) {
                     setPaintedAvatarUrl(messageRecieved?.Result?.partner)
                     setCurrentScreen("SEEART")
@@ -196,13 +246,16 @@ const JoinMeet: React.FC = () => {
     }
 
     useEffect(() => {
+        console.warn("isConnected", isConnected)
         if (!initialized.current) {
             initialized.current = true;
         }
+        if (meetName !== undefined)
+            newMessage("joinMeet", [`${myProvince}`, `${gender}`]);
     }, [isConnected]);
 
     return (
-        <div className={`${classes.main} ${pageLoading ? classes.loadingPage : ""}`}>
+        <div className={`${classes.main}`}>
             {currentScreen !== "JOINMEET" && currentScreen !== "COMPLETED" && (
                 <div className={classes.header}>
                     <BackButton imgSrc={giveup} callFunction={() => {
@@ -222,12 +275,23 @@ const JoinMeet: React.FC = () => {
                     question={singleQuestion?.title ?? ""}
                     questionId={`${singleQuestion?.id}`}
                     meetName={meetName ?? ""}
-                    key={`${meetName}-${isYesNo}-${singleQuestion?.id}-${emojis?.length}`}
+                    key={`${meetName}-${isYesNo}-${singleQuestion?.id}-${nextStep === undefined}`}
                     expirationDate={singleQuestion?.expireDate ?? ""}
                     answer={partnerResponse?.Answer ?? ""}
                     answerId={partnerResponse?.ResponseId}
                     emojis={emojis}
                     type={isYesNo}
+                    nextStep={() => {
+                        if (nextStepStr === "General") {
+                            newMessage("NextGeneralQuestion", [`${meetName}`])
+                            setIsYesNo(false);
+                            setCurrentScreen("GENERALQ");
+                        } else if (nextStepStr === "Option" && isYesNo) {
+                            newMessage("Next2OptionQuestion", [`${meetName}`])
+                            setIsYesNo(true);
+                            setCurrentScreen("GENERALQ");
+                        }
+                    }}
                     calls={(methodName: string, args: any[]) => {
                         newMessage(methodName, args);
                         if (methodName === "Next2OptionQuestion")
@@ -242,6 +306,11 @@ const JoinMeet: React.FC = () => {
                     question={multipleQuestions ?? []}
                     answer={multipleResponses ? multipleResponses : []}
                     emojis={emojis}
+                    nextStep={() => {
+                        if (nextStepStr === "Option") {
+                            newMessage("Next2OptionQuestion", [meetName]);
+                        }
+                    }}
                     calls={(methodName: string, args: any[]) => {
                         if (methodName === "goToDraw") {
                             setCurrentScreen("DRAW")
@@ -251,7 +320,6 @@ const JoinMeet: React.FC = () => {
                         }
                     }}
                     isPersonal={personalQ}
-
                     meetName={meetName ?? ""} />
             )}
             {currentScreen === "DRAW" && (
@@ -309,7 +377,6 @@ const JoinMeet: React.FC = () => {
                 <PrimaryButton
                     onClick={() => {
                         form.submit();
-                        navigate("/home")
                     }}
                     label="ثبت"
                     myClassName={classes.modalButton} />
@@ -329,7 +396,8 @@ const JoinMeet: React.FC = () => {
                 </div>
                 <PrimaryButton
                     onClick={() => {
-                        form.submit();
+                        newMessage("endMeet", [""]);
+                        navigate("../home");
                     }}
                     label="باشه"
                     myClassName={classes.modalButton} />

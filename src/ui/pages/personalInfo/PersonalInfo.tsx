@@ -47,7 +47,8 @@ const PersonalInfo = () => {
         }
         if (selectedUsers.data !== undefined
             && selectedUsers.data.type === "profile"
-            && selectedUsers.data.result !== undefined) {
+            && selectedUsers.data.result !== undefined
+            && selectedUsers.data.result.province?.provinceId > 1) {
             form.setFieldValue("ProvinceId",
                 {
                     value: selectedUsers.data.result.province?.provinceId,
@@ -78,6 +79,7 @@ const PersonalInfo = () => {
     function getBase64(file: any) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
+            console.warn("file", file)
             reader.readAsDataURL(file);
             reader.onload = () => resolve(reader.result);
             reader.onerror = error => reject(error);
@@ -91,8 +93,7 @@ const PersonalInfo = () => {
         // Only to show two recent uploaded files, and old ones will be replaced by the new
         fileList = fileList.slice(-1);
         setFileListState(fileList);
-
-        getBase64(info.file).then(base64 => {
+        getBase64(info.file.originFileObj ?? info.file).then(base64 => {
             setImageUrl(base64) // Here's your base64 string
         });
 
@@ -100,11 +101,12 @@ const PersonalInfo = () => {
 
     const handleSave = (values: any) => {
         if (state?.from && state?.from === "HOME") {
+            console.warn("state", state?.from)
             dispatch(acceptTerms());
-            dispatch(editProfile({ ...values, AvatarId: myAvatar.id }))
+            dispatch(editProfile({ ...values, AvatarId: myAvatar.id }));
         } else {
-            dispatch(completeProfile({ ...values, Gender: gender, AvatarId: myAvatar.id }));
             dispatch(acceptTerms());
+            dispatch(completeProfile({ ...values, Gender: gender, AvatarId: myAvatar.id }));
         }
     }
     return (
@@ -157,8 +159,10 @@ const PersonalInfo = () => {
                                 placeholder="شهر خود را انتخاب کنید"
                                 showSearch
                                 optionFilterProp="children"
-                                filterOption={(input, option) =>
-                                    option?.props?.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+                                key={provinces.length}
+                                filterOption={(input, option) => {
+                                    return option?.props?.label?.toLowerCase().includes(input.toLowerCase())
+                                }
                                 }
                                 onChange={handleChange}
                                 options={provinces}
@@ -181,14 +185,14 @@ const PersonalInfo = () => {
                             rules={[
                                 {
                                     required: true,
-                                    message: 'input Image',
+                                    message: 'لطفا عکس خود را بارگذاری کنید',
                                 },
                             ]}
                         >
                             <Upload
                                 beforeUpload={(file) => {
                                     if (file.size > 500 * 1024) {
-                                        form.setFields([{name: "Profile", errors:["سایز عکس باید کمتر از 500 کیلوبایت باشد"]}])
+                                        form.setFields([{ name: "Profile", errors: ["سایز عکس باید کمتر از 500 کیلوبایت باشد"] }])
                                         return false;
                                     }
                                     return true;

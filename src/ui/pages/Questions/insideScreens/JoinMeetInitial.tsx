@@ -22,7 +22,8 @@ const JoinMeetInitial: React.FC<IProps> = (props) => {
     useEffect(() => {
         console.log("jjj", props);
         if(props.partner && props.partner.Name && props.meetName) {
-            props.calls("StartGeneralQuestions", [`${props.meetName}`])
+            props.calls("StartGeneralQuestions", [`${props.meetName}`]);
+            props.calls("NextGeneralQuestion", [`${props.meetName}`]);
         }
     }, [props.partner, props.meetName])
     return (

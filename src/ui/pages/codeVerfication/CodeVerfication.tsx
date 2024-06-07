@@ -27,7 +27,7 @@ const CodeVerfication: React.FC = () => {
             localStorage.setItem("TOKEN", selectedUsers.data.accessToken)
             localStorage.setItem("REFRESH_TOKEN", selectedUsers.data.refreshToken)
             dispatch(reset())
-            navigate("/personalInfo");
+            navigate("/personalInfo", { state: { from: "LOGIN" } });
         } else if (selectedUsers.error && !selectedUsers.loading) {
             if(selectedUsers.error?.message) {
                 messageApi.open({

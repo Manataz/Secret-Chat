@@ -18,6 +18,7 @@ interface IProps {
     type: boolean;
     answer?: string;
     answerId?: number;
+    nextStep?: () => void;
     emojis?: EmojiResponse[];
     calls: (methodName: string, args: any[]) => void
 }
@@ -155,19 +156,23 @@ const GeneralQuestions: React.FC<IProps> = (props) => {
                     {myEmojiCode}
                 </div>
                 <EmojiPicker emojiChosen={(emojiCode: string) => {
-                    setMyEmojiCode(emojiCode)
-                    props.calls("addEmojie", [props.meetName, `${props.answerId}`, emojiCode])
+                    if(props.answerId) {
+                        setMyEmojiCode(emojiCode)
+                        props.calls("addEmojie", [props.meetName, `${props.answerId}`, emojiCode])
+                    }
                 }} />
             </div>
             <PrimaryButton label={nextButtonLabel} onClick={() => {
                 if (props.answer) {
-                    form.resetFields();
+                    if (props.nextStep) {
+                        console.error("fourth")    
+                        props.nextStep()
+                    }
+                    // form.resetFields();
                     setYesNoAnswer(undefined);
                     if (props.type) {
                         props.calls("Next2OptionQuestion", [`${props.meetName}`])
-                    } else {
-                        props.calls("NextGeneralQuestion", [`${props.meetName}`])
-                    }
+                    } 
                 }
             }} myClassName={classes.nextQButton} />
         </div>
